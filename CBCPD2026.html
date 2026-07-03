@@ -3,342 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA FAEP - MISSÃO CBCPD 2026</title>
+    <title>SISTEMA FAEP // A VIRADA DE CHAVE - CBCPD 2026</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Montserrat:wght@300;600;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Space+Grotesk:wght@400;600;700&family=Share+Tech+Mono&display=swap');
 
-        /* Variáveis Futuristas */
         :root {
-            --bg-dark: #050b14;
-            --neon-green: #00ff88;
-            --tech-blue: #00e5ff;
-            --text-light: #e2f1f8;
-            --hud-border: rgba(0, 255, 136, 0.3);
+            --bg-obsidian: #030508;
+            --emerald-glow: #00ff87;
+            --cyber-blue: #60efff;
+            --jessica-gold: #ffbd59;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Montserrat', sans-serif;
-            overflow: hidden; /* TRAVA A ROLAGEM TOTALMENTE */
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: 
-                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-
-        /* Efeito de Scanline de Monitor Antigo/Futurista */
-        body::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            z-index: 999;
-            pointer-events: none;
-        }
-
-        /* Container Principal (A "Tela") */
-        #interface-container {
-            width: 90vw;
-            height: 85vh;
-            position: relative;
-            border: 1px solid var(--hud-border);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1) inset;
-            perspective: 1000px;
-            display: flex;
-            background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
-            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
-        }
-
-        /* Elementos de HUD (Bordas) */
-        .hud-corner {
-            position: absolute; width: 20px; height: 20px;
-            border: 2px solid var(--neon-green);
-            z-index: 100;
-        }
-        .hud-top-left { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-        .hud-top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-        .hud-bottom-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-        .hud-bottom-right { bottom: 35px; right: 10px; border-left: none; border-top: none; }
-
-        /* Sistema de Slides (Cenas) */
-        .scene {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 4rem;
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(0.9) translateY(30px);
-            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .scene.active {
-            opacity: 1;
-            visibility: visible;
-            transform: scale(1) translateY(0);
-        }
-
-        /* Tipografia */
-        h1, h2 { font-weight: 900; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,255,136,0.5); text-align: center;}
-        h1 { font-size: 3.5rem; letter-spacing: 2px; }
-        h1 span { color: var(--neon-green); }
-        h2 { font-size: 2.5rem; color: var(--tech-blue); margin-bottom: 1rem; }
-        p { font-size: 1.3rem; line-height: 1.8; text-align: center; max-width: 800px; color: #a8b2d1; }
-        
-        .typewriter-text { font-family: 'Share Tech Mono', monospace; color: var(--neon-green); font-size: 1.1rem; letter-spacing: 1px; }
-
-        /* Imagens Holográficas */
-        .holo-img {
-            width: 300px; height: 300px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid var(--neon-green);
-            box-shadow: 0 0 20px var(--neon-green), inset 0 0 20px var(--neon-green);
-            margin-bottom: 2rem;
-            filter: grayscale(100%) sepia(100%) hue-rotate(85deg) saturate(300%) contrast(1.2);
-            animation: holoFloat 4s infinite ease-in-out;
-        }
-
-        /* Grid de Programação (Cards) */
-        .grid-tech {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 100%;
-            margin-top: 2rem;
-        }
-        .tech-card {
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid var(--hud-border);
-            padding: 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s;
-            position: relative;
+            background-color: var(--bg-obsidian);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
             overflow: hidden;
-        }
-        .tech-card::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
-            background: var(--neon-green);
-            transition: 0.5s;
-        }
-        .tech-card:hover::before { left: 0; }
-        .tech-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2); background: rgba(0, 255, 136, 0.1); }
-        .tech-card h3 { color: var(--tech-blue); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;}
-        .tech-card p { font-size: 0.95rem; text-align: left; }
-        .tech-card .roi-badge { margin-top: 10px; display: inline-block; background: var(--neon-green); color: #000; padding: 3px 8px; font-weight: bold; font-size: 0.8rem; border-radius: 3px;}
-
-        /* Botões de Ação e Navegação */
-        .nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green);
-            width: 50px; height: 50px; font-size: 1.5rem; cursor: pointer;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            transition: all 0.3s; z-index: 1000;
-        }
-        .nav-btn:hover { background: var(--neon-green); color: var(--bg-dark); box-shadow: 0 0 15px var(--neon-green); }
-        .prev-btn { left: -25px; }
-        .next-btn { right: -25px; }
-
-        .btn-link {
-            display: inline-block; margin-top: 20px; padding: 15px 30px;
-            background: rgba(0, 229, 255, 0.1); border: 1px solid var(--tech-blue); color: var(--tech-blue);
-            text-decoration: none; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem;
-            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; cursor: pointer;
-        }
-        .btn-link:hover { background: var(--tech-blue); color: #000; box-shadow: 0 0 20px var(--tech-blue); }
-
-        .btn-master {
-            padding: 20px 50px; font-size: 2rem; font-weight: 900; color: #000;
-            background: var(--neon-green); border: none; border-radius: 5px; cursor: pointer;
-            text-transform: uppercase; margin-top: 30px; animation: pulseMaster 2s infinite;
+            height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
         }
 
-        /* Barra de Progresso HUD */
-        .progress-bar-container {
-            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-            width: 300px; height: 4px; background: rgba(255,255,255,0.1);
+        /* FUNDO COM ORBES DE LUZ FLUTUANTES (VFX) */
+        .ambient-orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35;
+            z-index: 0; animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none;
         }
-        .progress-bar { height: 100%; background: var(--neon-green); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--neon-green); }
+        .orb-1 { width: 500px; height: 500px; background: var(--emerald-glow); top: -100px; left: -100px; }
+        .orb-2 { width: 600px; height: 600px; background: #3b82f6; bottom: -150px; right: -100px; animation-delay: -5s; }
+        .orb-3 { width: 400px; height: 400px; background: var(--jessica-gold); top: 40%; left: 60%; opacity: 0.15; animation-delay: -8s; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(60px, 40px) scale(1.2); } }
 
-        /* Animações */
-        @keyframes holoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes pulseMaster { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(0, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); } }
+        /* MARCA D'ÁGUA EDITORIAL GIGANTE */
+        .watermark {
+            position: absolute; font-family: 'Space Grotesk', sans-serif; font-weight: 900;
+            font-size: 18vw; color: rgba(255, 255, 255, 0.015); white-space: nowrap;
+            z-index: 1; pointer-events: none; text-transform: uppercase; letter-spacing: -5px;
+        }
+
+        /* HUD SUPERIOR & EQUALIZADOR DE ÁUDIO */
+        .top-hud {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 1.5rem 3rem;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .hud-tag { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: var(--emerald-glow); letter-spacing: 2px; }
         
-        /* Glitch Effect para Título */
-        .glitch { position: relative; display: inline-block; }
-        .glitch::before, .glitch::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
+        .audio-player-btn {
+            background: rgba(0, 255, 135, 0.1); border: 1px solid var(--emerald-glow); color: #fff;
+            padding: 8px 16px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; transition: all 0.3s;
         }
-        .glitch::before { left: 2px; text-shadow: -1px 0 red; animation: glitch-anim 2s infinite linear alternate-reverse; }
-        .glitch::after { left: -2px; text-shadow: -1px 0 blue; animation: glitch-anim2 3s infinite linear alternate-reverse; }
-        @keyframes glitch-anim { 0% { clip: rect(20px, 9999px, 85px, 0); } 20% { clip: rect(92px, 9999px, 14px, 0); } 40% { clip: rect(4px, 9999px, 50px, 0); } 60% { clip: rect(62px, 9999px, 99px, 0); } 80% { clip: rect(22px, 9999px, 34px, 0); } 100% { clip: rect(81px, 9999px, 16px, 0); } }
-        @keyframes glitch-anim2 { 0% { clip: rect(10px, 9999px, 75px, 0); } 20% { clip: rect(82px, 9999px, 24px, 0); } 40% { clip: rect(14px, 9999px, 40px, 0); } 60% { clip: rect(52px, 9999px, 89px, 0); } 80% { clip: rect(12px, 9999px, 44px, 0); } 100% { clip: rect(71px, 9999px, 6px, 0); } }
+        .audio-player-btn:hover { background: var(--emerald-glow); color: #000; box-shadow: 0 0 20px rgba(0,255,135,0.4); }
+        .equalizer { display: flex; gap: 3px; align-items: flex-end; height: 12px; }
+        .bar { width: 3px; background: var(--emerald-glow); height: 3px; transition: height 0.2s ease; }
+        .playing .bar { animation: bounce 0.5s infinite alternate; }
+        .playing .bar:nth-child(2) { animation-delay: 0.1s; }
+        .playing .bar:nth-child(3) { animation-delay: 0.3s; }
+        .playing .bar:nth-child(4) { animation-delay: 0.2s; }
+        @keyframes bounce { 0% { height: 3px; } 100% { height: 14px; } }
+
+        /* CONTAINER DE CENAS CINEMATOGRÁFICO */
+        #cinema-stage {
+            width: 88vw; height: 78vh; position: relative; z-index: 10;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* TRANSIÇÃO DE CENA COM DESFOQUE E ESCALA (CINEMATIC FOCUS) */
+        .scene {
+            position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; opacity: 0; visibility: hidden;
+            transform: scale(1.08); filter: blur(15px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scene.active { opacity: 1; visibility: visible; transform: scale(1); filter: blur(0); }
+
+        /* TIPOGRAFIA & DESIGN GRÁFICO */
+        h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 700; line-height: 1.05; text-align: center; margin-bottom: 1.5rem; letter-spacing: -1px; }
+        h1 .highlight { background: linear-gradient(90deg, var(--emerald-glow), var(--cyber-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 25px rgba(0,255,135,0.3)); }
+        h1 .gold-highlight { background: linear-gradient(90deg, #fff, var(--jessica-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        p.subtitle { font-size: clamp(1.1rem, 1.8vw, 1.4rem); color: var(--text-muted); max-width: 750px; text-align: center; line-height: 1.6; font-weight: 300; }
+
+        /* CARTÕES COM GLASSMORPHISM 2.0 */
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+        }
+        /* Feixes de luz passando pelo cartão */
+        .glass-card::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(60deg, transparent 45%, rgba(255,255,255,0.03) 50%, transparent 55%);
+            animation: shine 8s infinite linear; pointer-events: none;
+        }
+        @keyframes shine { 0% { transform: translateX(-100%) translateY(-100%); } 100% { transform: translateX(100%) translateY(100%); } }
+
+        /* LAYOUT ASSIMÉTRICO (SPLIT SCREEN EDITORIAL) */
+        .split-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; align-items: center; width: 100%; max-width: 1100px; }
+        .split-layout.reverse { grid-template-columns: 1.2fr 1fr; }
+
+        /* IMAGENS COM SCANNER A LASER (VFX) */
+        .img-container { position: relative; width: 320px; height: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); margin: 0 auto; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) saturate(1.1); transition: transform 0.7s ease; }
+        .img-container:hover img { transform: scale(1.05); }
+        .laser-scanner {
+            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--emerald-glow); box-shadow: 0 0 15px var(--emerald-glow), 0 0 30px var(--emerald-glow);
+            animation: scanImg 3s infinite ease-in-out alternate; z-index: 5;
+        }
+        .laser-gold { background: var(--jessica-gold); box-shadow: 0 0 15px var(--jessica-gold), 0 0 30px var(--jessica-gold); }
+        @keyframes scanImg { 0% { top: 0%; opacity: 0.8; } 100% { top: 98%; opacity: 0.8; } }
+
+        /* TAGS DE COMUNICAÇÃO VISUAL */
+        .tag-wrap { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tag { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; padding: 6px 12px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 1px; }
+        .tag-green { color: var(--emerald-glow); border-color: rgba(0,255,135,0.3); background: rgba(0,255,135,0.05); }
+        .tag-gold { color: var(--jessica-gold); border-color: rgba(255,189,89,0.3); background: rgba(255,189,89,0.05); }
+
+        /* GRID DO EVENTO & ROI */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; width: 100%; max-width: 1000px; margin-top: 2rem; }
+        .module-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.8rem;
+            border-radius: 16px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden;
+        }
+        .module-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.05); border-color: var(--emerald-glow); box-shadow: 0 15px 30px rgba(0,255,135,0.1); }
+        .module-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: #fff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        .module-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+        .roi-pill { margin-top: 1rem; display: inline-block; font-size: 0.75rem; font-family: 'Share Tech Mono', monospace; color: var(--emerald-glow); background: rgba(0,255,135,0.1); padding: 4px 8px; border-radius: 4px; }
+
+        /* BOTÕES DISRUPTIVOS & NAVEGAÇÃO */
+        .btn-epic {
+            position: relative; padding: 1.2rem 3rem; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+            font-size: 1.1rem; color: #000; background: var(--emerald-glow); border: none; border-radius: 50px;
+            cursor: pointer; overflow: hidden; transition: all 0.4s ease; box-shadow: 0 0 30px rgba(0,255,135,0.4);
+            display: inline-flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2rem;
+        }
+        .btn-epic:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 0 50px rgba(0,255,135,0.7); background: #fff; }
+        
+        .btn-official-link {
+            display: inline-block; padding: 12px 24px; border: 1px solid var(--cyber-blue); color: var(--cyber-blue);
+            text-decoration: none; border-radius: 30px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 1.5rem;
+        }
+        .btn-official-link:hover { background: var(--cyber-blue); color: #000; box-shadow: 0 0 20px rgba(96,239,255,0.4); }
+
+        /* CONTROLES DE NAVEGAÇÃO HUD INFERIOR */
+        .bottom-hud {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 2rem 3rem;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-arrows { display: flex; gap: 15px; }
+        .arrow-btn {
+            width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .arrow-btn:hover { background: #fff; color: #000; transform: scale(1.1); }
+        .arrow-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+        
+        .progress-indicator { display: flex; gap: 8px; align-items: center; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.4s ease; }
+        .dot.active { width: 30px; border-radius: 10px; background: var(--emerald-glow); box-shadow: 0 0 10px var(--emerald-glow); }
+
+        /* EFEITO DE CELEBRAÇÃO FINAL (TELA DE SUCESSO) */
+        #success-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, rgba(0,255,135,0.15) 0%, rgba(3,5,8,0.95) 100%);
+            z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.8s ease; backdrop-filter: blur(20px);
+        }
+        #success-overlay.show { opacity: 1; visibility: visible; }
+        .seal-approved {
+            border: 3px solid var(--emerald-glow); color: var(--emerald-glow); font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem; font-weight: 900; padding: 1rem 3rem; border-radius: 12px; text-transform: uppercase;
+            letter-spacing: 4px; box-shadow: 0 0 50px rgba(0,255,135,0.5), inset 0 0 30px rgba(0,255,135,0.3);
+            transform: scale(0.5); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #success-overlay.show .seal-approved { transform: scale(1) rotate(-3deg); }
+
+        @media (max-width: 900px) {
+            .split-layout, .split-layout.reverse { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
+            .img-container { width: 220px; height: 280px; }
+            .grid-3 { grid-template-columns: 1fr; max-height: 50vh; overflow-y: auto; }
+            .top-hud, .bottom-hud { padding: 1rem 1.5rem; }
+            .watermark { font-size: 25vw; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- INTERFACE PRINCIPAL -->
-    <div id="interface-container">
+    <!-- ELEMENTO DE ÁUDIO INVISÍVEL -->
+    <audio id="bgMusic" loop>
+        <source src="missao.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- VFX BACKGROUND ORBS -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    <div class="watermark" id="watermark-text">FAEP // 2026</div>
+
+    <!-- HUD SUPERIOR -->
+    <div class="top-hud">
+        <div class="hud-tag">SISTEMA FAEP // TECNOLOGIA DE APLICAÇÃO</div>
+        <button class="audio-player-btn" id="audioBtn" onclick="toggleAudio()">
+            <span>TRILHA SONORA</span>
+            <div class="equalizer" id="eq">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+        </button>
+    </div>
+
+    <!-- PALCO CINEMATOGRÁFICO -->
+    <div id="cinema-stage">
         
-        <!-- HUD Elements -->
-        <div class="hud-corner hud-top-left"></div>
-        <div class="hud-corner hud-top-right"></div>
-        <div class="hud-corner hud-bottom-left"></div>
-        <div class="hud-corner hud-bottom-right"></div>
-        <div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-family: 'Share Tech Mono'; color: var(--neon-green); font-size: 0.8rem;">SYS.SEC.FAEP // PROTOCOLO_CBCPD</div>
-
-        <!-- Botões de Navegação (Desligados na Cena 1) -->
-        <button class="nav-btn prev-btn" onclick="mudarCena(-1)" id="btnPrev" style="display: none;">&#10094;</button>
-        <button class="nav-btn next-btn" onclick="mudarCena(1)" id="btnNext">&#10095;</button>
-
-        <!-- CENA 1: BOOT & HOOK -->
+        <!-- CENA 0: O HOOK EMOCIONAL -->
         <div class="scene active" id="scene-0">
-            <p class="typewriter-text" style="margin-bottom: 2rem;" id="type1">Iniciando decodificação de dados...</p>
-            <h1>Algumas oportunidades não são viagens.<br><span class="glitch" data-text="SÃO VIRADAS DE CHAVE.">SÃO VIRADAS DE CHAVE.</span></h1>
-            <p style="margin-top: 2rem;">Todo produtor rural precisa de orientação. Mas a excelência técnica começa com alguém que nunca para de atualizar seu banco de dados.</p>
+            <div class="tag tag-green" style="margin-bottom: 2rem;">COMUNICADO ESTRATÉGICO À GERÊNCIA</div>
+            <h1>Algumas oportunidades não são viagens.<br><span class="highlight">SÃO VIRADAS DE CHAVE.</span></h1>
+            <p class="subtitle" style="margin-top: 1rem;">O agronegócio não evolui apenas com máquinas de última geração. Ele evolui por meio de pessoas que têm a coragem de buscar a vanguarda do conhecimento científico e aplicá-lo no campo.</p>
+            <button class="btn-epic" onclick="changeScene(1)">INICIAR EXPERIÊNCIA <span style="font-size:1.2rem;">→</span></button>
         </div>
 
-        <!-- CENA 2: O PROTAGONISTA -->
+        <!-- CENA 1: O PROTAGONISTA -->
         <div class="scene" id="scene-1">
-            <div style="display: flex; align-items: center; gap: 4rem; width: 100%;">
-                <img src="Cópia de Gabriel_Gugel-06585.jpg" alt="Gabriel" class="holo-img">
-                <div style="text-align: left;">
-                    <p class="typewriter-text">ID: GABRIEL // ALVO: ESPECIALISTA_APLICAÇÃO</p>
-                    <h2 style="text-align: left;">Operador de Transformação</h2>
-                    <p style="text-align: left;">Ele não quer apenas cumprir funções em modo automático. O objetivo central é absorver ciência de aplicação, mitigar derivas e compilar conhecimento atualizado para os instrutores e produtores rurais.</p>
-                    <div style="margin-top: 1.5rem; padding-left: 1rem; border-left: 3px solid var(--tech-blue); color: var(--tech-blue); font-style: italic;">
-                        "A tecnologia não se aprende só no escritório. Ela é forjada no campo."
+            <div class="split-layout">
+                <div class="img-container">
+                    <div class="laser-scanner"></div>
+                    <img src="Cópia de Gabriel_Gugel-06585.jpg" alt="Gabriel Marques" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'">
+                </div>
+                <div>
+                    <div class="tag-wrap">
+                        <div class="tag tag-green">ANALISTA TÉCNICO</div>
+                        <div class="tag">ENGENHEIRO AGRÔNOMO</div>
+                    </div>
+                    <h1 style="text-align: left; font-size: 3rem;">Gabriel Gugel</h1>
+                    <p class="subtitle" style="text-align: left; margin-bottom: 1.5rem;">Responsável por capacitações ligadas a grãos, tecnologia de aplicação, pulverizadores e segurança. Gabriel não busca apenas preencher relatórios; seu objetivo profissional é construir um legado técnico e se tornar <strong>especialista em tecnologia de aplicação</strong>.</p>
+                    <div class="glass-card" style="padding: 1.5rem; border-left: 3px solid var(--emerald-glow);">
+                        <p style="font-style: italic; color: #fff; font-size: 1.05rem;">"A tecnologia de aplicação não se constrói dentro de um escritório. Ela surge na ciência, no debate com pesquisadores e na realidade prática de quem está na fronteira do campo."</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CENA 3: A LIDERANÇA -->
+        <!-- CENA 2: A LIDERANÇA -->
         <div class="scene" id="scene-2">
-            <div style="display: flex; align-items: center; flex-direction: row-reverse; gap: 4rem; width: 100%;">
-                <img src="Jessica DETEC Boletim.jpg" alt="Jéssica" class="holo-img">
-                <div style="text-align: right;">
-                    <p class="typewriter-text">ID: JÉSSICA // STATUS: LIDERANÇA_VISIONÁRIA</p>
-                    <h2 style="text-align: right;">O Comando Estratégico</h2>
-                    <p style="text-align: right;">Por trás de todo colaborador que processa novos conhecimentos, existe uma gerente empoderada que aprova a conexão. No dia 02/10/2026, Gabriel transferiu seu sonho. Ela ouviu. Ela validou o potencial. E os dados não foram apagados.</p>
+            <div class="split-layout reverse">
+                <div>
+                    <div class="tag-wrap">
+                        <div class="tag tag-gold">LIDERANÇA VISIONÁRIA</div>
+                        <div class="tag">GESTÃO ESTRATÉGICA</div>
+                    </div>
+                    <h1 style="text-align: left; font-size: 3rem;"><span class="gold-highlight">Gerente Jéssica</span></h1>
+                    <p class="subtitle" style="text-align: left; margin-bottom: 1.5rem;">Grandes gestoras não administram apenas processos; elas <strong>impulsionam futuros</strong>. Uma liderança empoderada, humana e inspiradora entende que o investimento na evolução intelectual da equipe é o maior patrimônio de uma instituição.</p>
+                    <div class="glass-card" style="padding: 1.5rem; border-left: 3px solid var(--jessica-gold);">
+                        <p style="color: #fff; font-size: 1rem;">📅 <strong>O marco da confiança:</strong> No dia 02/10/2026, às 14h30, Gabriel compartilhou seu sonho de especialização. Você ouviu, validou o potencial técnico e demonstrou o apoio que transforma equipes comuns em referências no setor.</p>
+                    </div>
+                </div>
+                <div class="img-container" style="border-color: rgba(255,189,89,0.3);">
+                    <div class="laser-scanner laser-gold"></div>
+                    <img src="Jessica DETEC Boletim.JPG" alt="Gerente Jéssica" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80'">
                 </div>
             </div>
         </div>
 
-        <!-- CENA 4: O EVENTO (O ALVO) -->
+        <!-- CENA 3: O ALVO ESTRATÉGICO -->
         <div class="scene" id="scene-3">
-            <h2 class="glitch" data-text="ALVO LOCALIZADO: CBCPD 2026">ALVO LOCALIZADO: CBCPD 2026</h2>
-            <p style="font-size: 1.5rem;">Congresso Brasileiro da Ciência das Plantas Daninhas<br><span style="color: var(--neon-green);">03 a 06 de agosto | Foz do Iguaçu</span></p>
-            <p style="margin-top: 1rem;">O ambiente perfeito para download das maiores atualizações sobre manejo de herbicidas, resistência, inovação e tecnologia de aplicação.</p>
-            <a href="https://cbcpd2026.com.br/" target="_blank" class="btn-link">ACESSAR PORTAL OFICIAL DO EVENTO</a>
+            <div class="tag tag-green" style="margin-bottom: 1rem;">OPORTUNIDADE DE ALTA RELEVÂNCIA</div>
+            <h1>CBCPD <span class="highlight">2026</span></h1>
+            <p class="subtitle" style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Congresso Brasileiro da Ciência das Plantas Daninhas</p>
+            <p class="subtitle">📍 Foz do Iguaçu / PR &nbsp;|&nbsp; 🗓️ 03 a 06 de Agosto de 2026</p>
+            
+            <div class="glass-card" style="margin-top: 2rem; max-width: 800px; text-align: center; padding: 2rem;">
+                <p style="font-size: 1.15rem; color: var(--text-main); line-height: 1.7;">Este evento não é um passeio, nem um luxo corporativo. É o epicentro nacional sobre manejo de herbicidas, biologia de plantas daninhas, mitigação de deriva e inovação agroquímica. A presença do Sistema FAEP neste palco é uma necessidade de posicionamento técnico.</p>
+                <a href="https://cbcpd2026.com.br/" target="_blank" class="btn-official-link">⚡ ACESSAR PORTAL OFICIAL DO EVENTO</a>
+            </div>
         </div>
 
-        <!-- CENA 5: A PROGRAMAÇÃO E O ROI -->
-        <div class="scene" id="scene-4" style="padding: 2rem;">
-            <h2>Extração de Dados: <span>Programação & ROI</span></h2>
-            <p>Por que essa missão é vital para a rede do Sistema FAEP?</p>
+        <!-- CENA 4: RETORNO SOBRE O INVESTIMENTO (ROI) -->
+        <div class="scene" id="scene-4">
+            <div class="tag tag-green" style="margin-bottom: 1rem;">MULTIPLICAÇÃO DO CONHECIMENTO</div>
+            <h1 style="font-size: 3rem;">Um colaborador vai.<br><span class="highlight">O RETORNO FICA PARA TODOS.</span></h1>
             
-            <div class="grid-tech">
-                <div class="tech-card">
-                    <h3>[ TECNOLOGIA DE APLICAÇÃO ]</h3>
-                    <p>Discussão profunda sobre novos pulverizadores, uso de adjuvantes e técnicas de mitigação de deriva.</p>
-                    <span class="roi-badge">RETORNO: Atualização imediata dos cursos de aplicadores.</span>
+            <div class="grid-3">
+                <div class="module-card">
+                    <h3>🎯 Mitigação de Deriva</h3>
+                    <p>Atualização de ponta sobre tecnologias de aplicação para reduzir perdas e proteger as lavouras paranaenses.</p>
+                    <span class="roi-pill">ROI: CURSOS SENAR-PR</span>
                 </div>
-                <div class="tech-card">
-                    <h3>[ MANEJO DE RESISTÊNCIA ]</h3>
-                    <p>Mapeamento químico das novas moléculas e como combater plantas daninhas que ameaçam as lavouras paranaenses.</p>
-                    <span class="roi-badge">RETORNO: Novos conteúdos práticos para instrutores.</span>
+                <div class="module-card">
+                    <h3>🧪 Resistência Química</h3>
+                    <p>Acesso antecipado a novas moléculas herbicidas e estratégias de controle para produtores rurais.</p>
+                    <span class="roi-pill">ROI: INOVADORES DA PONTA</span>
                 </div>
-                <div class="tech-card">
-                    <h3>[ NETWORKING CIENTÍFICO ]</h3>
-                    <p>Conexão direta com os servidores centrais do agro: Pesquisadores de ponta, Embrapa e empresas do setor.</p>
-                    <span class="roi-badge">RETORNO: Contatos estratégicos para o Sistema FAEP.</span>
+                <div class="module-card">
+                    <h3>🤝 Networking Científico</h3>
+                    <p>Conexão direta com pesquisadores da Embrapa e universidades para futuros projetos do Sistema FAEP.</p>
+                    <span class="roi-pill">ROI: INTELIGÊNCIA INSTITUCIONAL</span>
                 </div>
             </div>
-            <p class="typewriter-text" style="margin-top: 2rem;">Garantia de segurança: Emissão de relatório técnico completo (e um PPT de 80 slides justificando cada bit investido).</p>
+            <p style="margin-top: 2rem; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--jessica-gold);">📎 COMPROMISSO TÉCNICO: Entrega de relatório completo + Apresentação executiva de 80 slides justificando cada segundo investido!</p>
         </div>
 
-        <!-- CENA 6: DECISÃO FINAL -->
+        <!-- CENA 5: O PEDIDO FINAL -->
         <div class="scene" id="scene-5">
-            <p class="typewriter-text">SISTEMA AGUARDANDO COMANDO DE CHEFIA...</p>
-            <h1 style="font-size: 4rem; margin: 1rem 0;">Jéssica, o alcance chegou.</h1>
-            <p style="font-size: 1.5rem;">O agro precisa. O Gabriel precisa. Os produtores merecem. <br>Autorizar essa participação é investir em conhecimento que retornará multiplicado para o Sistema FAEP.</p>
+            <div class="tag tag-gold" style="margin-bottom: 1.5rem;">COMANDO DE APROVAÇÃO</div>
+            <h1 style="font-size: clamp(3rem, 6vw, 5rem);">Jéssica,<br>o alcance chegou.</h1>
+            <p class="subtitle" style="margin-bottom: 2.5rem; max-width: 650px;">O agro paranaense precisa. O Gabriel está preparado. Os produtores rurais merecem essa excelência técnica. <br><strong style="color:#fff;">Autoriza essa missão estratégica?</strong></p>
             
-            <button class="btn-master" onclick="autorizar()">
-                AUTORIZAR MISSÃO AGORA
+            <button class="btn-epic" style="transform: scale(1.1); background: linear-gradient(90deg, var(--emerald-glow), var(--cyber-blue));" onclick="triggerApproval()">
+                ⚡ SIM, AUTORIZAR MISSÃO TÁTICA
             </button>
-        </div>
-
-        <!-- Barra de Progresso -->
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar"></div>
         </div>
 
     </div>
 
+    <!-- HUD INFERIOR (NAVEGAÇÃO) -->
+    <div class="bottom-hud">
+        <div class="progress-indicator" id="dots">
+            <div class="dot active" onclick="changeScene(0)"></div>
+            <div class="dot" onclick="changeScene(1)"></div>
+            <div class="dot" onclick="changeScene(2)"></div>
+            <div class="dot" onclick="changeScene(3)"></div>
+            <div class="dot" onclick="changeScene(4)"></div>
+            <div class="dot" onclick="changeScene(5)"></div>
+        </div>
+        <div class="nav-arrows">
+            <button class="arrow-btn" id="prevBtn" onclick="navigate(-1)" disabled>←</button>
+            <button class="arrow-btn" id="nextBtn" onclick="navigate(1)">→</button>
+        </div>
+    </div>
+
+    <!-- TELA DE CELEBRAÇÃO FINAL (OVERLAY) -->
+    <div id="success-overlay">
+        <div class="ambient-orb orb-1" style="opacity: 0.8; top: 20%; left: 30%;"></div>
+        <div class="seal-approved">★ MISSÃO AUTORIZADA ★</div>
+        <h1 style="margin-top: 2rem; font-size: 3rem;">O Futuro Técnico Começa Agora.</h1>
+        <p class="subtitle" style="color: #fff; max-width: 600px;">O Sistema FAEP e os produtores rurais do Paraná agradecem a sua liderança visionária, Jéssica. Protocolo de capacitação ativado com sucesso!</p>
+        <div class="tag tag-green" style="margin-top: 2rem; padding: 10px 20px; font-size: 1rem;">PASSAGEM & INSCRIÇÃO: CBCPD 2026 // CONFIRMADOS</div>
+    </div>
+
     <script>
         let currentScene = 0;
+        let isAudioPlaying = false;
+        const totalScenes = 6;
         const scenes = document.querySelectorAll('.scene');
-        const progressBar = document.getElementById('progressBar');
-        const btnPrev = document.getElementById('btnPrev');
-        const btnNext = document.getElementById('btnNext');
-        const totalScenes = scenes.length;
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const audio = document.getElementById('bgMusic');
+        const audioBtn = document.getElementById('audioBtn');
+        const eq = document.getElementById('eq');
+        const watermarkText = document.getElementById('watermark-text');
 
-        // Máquina de escrever para a cena inicial
-        function typeWriter(text, i, fnCallback) {
-            if (i < (text.length)) {
-                document.getElementById("type1").innerHTML = text.substring(0, i+1) + '<span aria-hidden="true">_</span>';
-                setTimeout(function() { typeWriter(text, i + 1, fnCallback) }, 50);
-            } else if (typeof fnCallback == 'function') {
-                setTimeout(fnCallback, 700);
+        const watermarkLabels = ["FAEP // 2026", "GABRIEL // AGRONOMIA", "JÉSSICA // LIDERANÇA", "CBCPD // FOZ DO IGUAÇU", "ROI // IMPACTO", "MISSÃO // APROVAÇÃO"];
+
+        // Sistema de Navegação
+        function changeScene(index) {
+            if (index < 0 || index >= totalScenes) return;
+
+            // Iniciar áudio automaticamente no primeiro clique se ainda não estiver tocando
+            if (!isAudioPlaying && index === 1) {
+                toggleAudio();
+            }
+
+            scenes[currentScene].classList.remove('active');
+            dots[currentScene].classList.remove('active');
+            
+            currentScene = index;
+            
+            scenes[currentScene].classList.add('active');
+            dots[currentScene].classList.add('active');
+            
+            watermarkText.innerText = watermarkLabels[currentScene];
+
+            // Atualizar estado dos botões
+            prevBtn.disabled = currentScene === 0;
+            nextBtn.disabled = currentScene === totalScenes - 1;
+        }
+
+        function navigate(dir) {
+            changeScene(currentScene + dir);
+        }
+
+        // Navegação pelo Teclado (Setas)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                navigate(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                navigate(-1);
+            }
+        });
+
+        // Sistema do Player de Áudio Visual
+        function toggleAudio() {
+            if (isAudioPlaying) {
+                audio.pause();
+                audioBtn.classList.remove('playing');
+                isAudioPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    audioBtn.classList.add('playing');
+                    isAudioPlaying = true;
+                }).catch(() => {
+                    alert('Por favor, adicione o arquivo "missao.mp3" na pasta para o áudio funcionar.');
+                });
             }
         }
-        // Inicia o efeito apenas uma vez no load
-        window.onload = function() {
-            typeWriter("Iniciando decodificação de dados... ", 0);
-            updateHUD();
-        };
 
-        function mudarCena(direction) {
-            scenes[currentScene].classList.remove('active');
-            currentScene += direction;
+        // Efeito de Celebração Disruptiva
+        function triggerApproval() {
+            const overlay = document.getElementById('success-overlay');
+            overlay.classList.add('show');
             
-            if (currentScene < 0) currentScene = 0;
-            if (currentScene >= totalScenes) currentScene = totalScenes - 1;
-
-            scenes[currentScene].classList.add('active');
-            updateHUD();
-        }
-
-        function updateHUD() {
-            // Atualiza barra de progresso
-            const progress = ((currentScene + 1) / totalScenes) * 100;
-            progressBar.style.width = progress + '%';
-
-            // Controla visibilidade dos botões
-            btnPrev.style.display = currentScene === 0 ? 'none' : 'flex';
-            btnNext.style.display = currentScene === totalScenes - 1 ? 'none' : 'flex';
-        }
-
-        function autorizar() {
-            // Efeito visual de hack/sucesso
-            document.getElementById('interface-container').style.background = "radial-gradient(circle at center, #00ff88 0%, #003311 100%)";
-            document.getElementById('scene-5').innerHTML = `
-                <h1 style="color: #000; text-shadow: none;">MISSÃO APROVADA</h1>
-                <p style="color: #000; font-weight: bold; font-size: 1.5rem; margin-top: 2rem;">Acesso garantido ao CBCPD 2026.<br>Preparar protocolo de retorno (PPT 80 slides).</p>
-            `;
+            // Tocar áudio se estiver mutado
+            if (!isAudioPlaying) { toggleAudio(); }
+            
+            // Efeito de confete digital via console e vibração visual
+            document.body.style.background = "radial-gradient(circle, #002c17 0%, #030508 100%)";
         }
     </script>
 </body>
