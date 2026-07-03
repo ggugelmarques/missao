@@ -199,9 +199,9 @@
 </head>
 <body>
 
-    <!-- ELEMENTO DE ÁUDIO INVISÍVEL -->
+    <!-- ELEMENTO DE ÁUDIO INVISÍVEL ATUALIZADO -->
     <audio id="bgMusic" loop>
-        <source src="missao.mp3" type="audio/mpeg">
+        <source src="the_mountain-sci-fi-512284.mp3" type="audio/mpeg">
     </audio>
 
     <!-- VFX BACKGROUND ORBS -->
@@ -402,7 +402,7 @@
             }
         });
 
-        // Sistema do Player de Áudio Visual
+        // Sistema do Player de Áudio Visual ATUALIZADO
         function toggleAudio() {
             if (isAudioPlaying) {
                 audio.pause();
@@ -413,7 +413,7 @@
                     audioBtn.classList.add('playing');
                     isAudioPlaying = true;
                 }).catch(() => {
-                    alert('Por favor, adicione o arquivo "missao.mp3" na pasta para o áudio funcionar.');
+                    alert('Por favor, adicione o arquivo "the_mountain-sci-fi-512284.mp3" na pasta para o áudio funcionar.');
                 });
             }
         }
