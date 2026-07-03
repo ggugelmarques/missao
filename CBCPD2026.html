@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA FAEP - MISSÃO CBCPD 2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Montserrat:wght@300;600;900&display=swap');
+
+        /* Variáveis Futuristas */
+        :root {
+            --bg-dark: #050b14;
+            --neon-green: #00ff88;
+            --tech-blue: #00e5ff;
+            --text-light: #e2f1f8;
+            --hud-border: rgba(0, 255, 136, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; /* TRAVA A ROLAGEM TOTALMENTE */
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Efeito de Scanline de Monitor Antigo/Futurista */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* Container Principal (A "Tela") */
+        #interface-container {
+            width: 90vw;
+            height: 85vh;
+            position: relative;
+            border: 1px solid var(--hud-border);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1) inset;
+            perspective: 1000px;
+            display: flex;
+            background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+        }
+
+        /* Elementos de HUD (Bordas) */
+        .hud-corner {
+            position: absolute; width: 20px; height: 20px;
+            border: 2px solid var(--neon-green);
+            z-index: 100;
+        }
+        .hud-top-left { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .hud-top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .hud-bottom-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .hud-bottom-right { bottom: 35px; right: 10px; border-left: none; border-top: none; }
+
+        /* Sistema de Slides (Cenas) */
+        .scene {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.9) translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Tipografia */
+        h1, h2 { font-weight: 900; text-transform: uppercase; text-shadow: 0 0 10px rgba(0,255,136,0.5); text-align: center;}
+        h1 { font-size: 3.5rem; letter-spacing: 2px; }
+        h1 span { color: var(--neon-green); }
+        h2 { font-size: 2.5rem; color: var(--tech-blue); margin-bottom: 1rem; }
+        p { font-size: 1.3rem; line-height: 1.8; text-align: center; max-width: 800px; color: #a8b2d1; }
+        
+        .typewriter-text { font-family: 'Share Tech Mono', monospace; color: var(--neon-green); font-size: 1.1rem; letter-spacing: 1px; }
+
+        /* Imagens Holográficas */
+        .holo-img {
+            width: 300px; height: 300px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green), inset 0 0 20px var(--neon-green);
+            margin-bottom: 2rem;
+            filter: grayscale(100%) sepia(100%) hue-rotate(85deg) saturate(300%) contrast(1.2);
+            animation: holoFloat 4s infinite ease-in-out;
+        }
+
+        /* Grid de Programação (Cards) */
+        .grid-tech {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-top: 2rem;
+        }
+        .tech-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid var(--hud-border);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .tech-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px;
+            background: var(--neon-green);
+            transition: 0.5s;
+        }
+        .tech-card:hover::before { left: 0; }
+        .tech-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2); background: rgba(0, 255, 136, 0.1); }
+        .tech-card h3 { color: var(--tech-blue); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase;}
+        .tech-card p { font-size: 0.95rem; text-align: left; }
+        .tech-card .roi-badge { margin-top: 10px; display: inline-block; background: var(--neon-green); color: #000; padding: 3px 8px; font-weight: bold; font-size: 0.8rem; border-radius: 3px;}
+
+        /* Botões de Ação e Navegação */
+        .nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green);
+            width: 50px; height: 50px; font-size: 1.5rem; cursor: pointer;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            transition: all 0.3s; z-index: 1000;
+        }
+        .nav-btn:hover { background: var(--neon-green); color: var(--bg-dark); box-shadow: 0 0 15px var(--neon-green); }
+        .prev-btn { left: -25px; }
+        .next-btn { right: -25px; }
+
+        .btn-link {
+            display: inline-block; margin-top: 20px; padding: 15px 30px;
+            background: rgba(0, 229, 255, 0.1); border: 1px solid var(--tech-blue); color: var(--tech-blue);
+            text-decoration: none; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem;
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; cursor: pointer;
+        }
+        .btn-link:hover { background: var(--tech-blue); color: #000; box-shadow: 0 0 20px var(--tech-blue); }
+
+        .btn-master {
+            padding: 20px 50px; font-size: 2rem; font-weight: 900; color: #000;
+            background: var(--neon-green); border: none; border-radius: 5px; cursor: pointer;
+            text-transform: uppercase; margin-top: 30px; animation: pulseMaster 2s infinite;
+        }
+
+        /* Barra de Progresso HUD */
+        .progress-bar-container {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 4px; background: rgba(255,255,255,0.1);
+        }
+        .progress-bar { height: 100%; background: var(--neon-green); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--neon-green); }
+
+        /* Animações */
+        @keyframes holoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulseMaster { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(0, 255, 136, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); } }
+        
+        /* Glitch Effect para Título */
+        .glitch { position: relative; display: inline-block; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
+        }
+        .glitch::before { left: 2px; text-shadow: -1px 0 red; animation: glitch-anim 2s infinite linear alternate-reverse; }
+        .glitch::after { left: -2px; text-shadow: -1px 0 blue; animation: glitch-anim2 3s infinite linear alternate-reverse; }
+        @keyframes glitch-anim { 0% { clip: rect(20px, 9999px, 85px, 0); } 20% { clip: rect(92px, 9999px, 14px, 0); } 40% { clip: rect(4px, 9999px, 50px, 0); } 60% { clip: rect(62px, 9999px, 99px, 0); } 80% { clip: rect(22px, 9999px, 34px, 0); } 100% { clip: rect(81px, 9999px, 16px, 0); } }
+        @keyframes glitch-anim2 { 0% { clip: rect(10px, 9999px, 75px, 0); } 20% { clip: rect(82px, 9999px, 24px, 0); } 40% { clip: rect(14px, 9999px, 40px, 0); } 60% { clip: rect(52px, 9999px, 89px, 0); } 80% { clip: rect(12px, 9999px, 44px, 0); } 100% { clip: rect(71px, 9999px, 6px, 0); } }
+    </style>
+</head>
+<body>
+
+    <!-- INTERFACE PRINCIPAL -->
+    <div id="interface-container">
+        
+        <!-- HUD Elements -->
+        <div class="hud-corner hud-top-left"></div>
+        <div class="hud-corner hud-top-right"></div>
+        <div class="hud-corner hud-bottom-left"></div>
+        <div class="hud-corner hud-bottom-right"></div>
+        <div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-family: 'Share Tech Mono'; color: var(--neon-green); font-size: 0.8rem;">SYS.SEC.FAEP // PROTOCOLO_CBCPD</div>
+
+        <!-- Botões de Navegação (Desligados na Cena 1) -->
+        <button class="nav-btn prev-btn" onclick="mudarCena(-1)" id="btnPrev" style="display: none;">&#10094;</button>
+        <button class="nav-btn next-btn" onclick="mudarCena(1)" id="btnNext">&#10095;</button>
+
+        <!-- CENA 1: BOOT & HOOK -->
+        <div class="scene active" id="scene-0">
+            <p class="typewriter-text" style="margin-bottom: 2rem;" id="type1">Iniciando decodificação de dados...</p>
+            <h1>Algumas oportunidades não são viagens.<br><span class="glitch" data-text="SÃO VIRADAS DE CHAVE.">SÃO VIRADAS DE CHAVE.</span></h1>
+            <p style="margin-top: 2rem;">Todo produtor rural precisa de orientação. Mas a excelência técnica começa com alguém que nunca para de atualizar seu banco de dados.</p>
+        </div>
+
+        <!-- CENA 2: O PROTAGONISTA -->
+        <div class="scene" id="scene-1">
+            <div style="display: flex; align-items: center; gap: 4rem; width: 100%;">
+                <img src="2.jpg" alt="Gabriel" class="holo-img">
+                <div style="text-align: left;">
+                    <p class="typewriter-text">ID: GABRIEL // ALVO: ESPECIALISTA_APLICAÇÃO</p>
+                    <h2 style="text-align: left;">Operador de Transformação</h2>
+                    <p style="text-align: left;">Ele não quer apenas cumprir funções em modo automático. O objetivo central é absorver ciência de aplicação, mitigar derivas e compilar conhecimento atualizado para os instrutores e produtores rurais.</p>
+                    <div style="margin-top: 1.5rem; padding-left: 1rem; border-left: 3px solid var(--tech-blue); color: var(--tech-blue); font-style: italic;">
+                        "A tecnologia não se aprende só no escritório. Ela é forjada no campo."
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENA 3: A LIDERANÇA -->
+        <div class="scene" id="scene-2">
+            <div style="display: flex; align-items: center; flex-direction: row-reverse; gap: 4rem; width: 100%;">
+                <img src="Jessica DETEC Boletim.jpg" alt="Jéssica" class="holo-img">
+                <div style="text-align: right;">
+                    <p class="typewriter-text">ID: JÉSSICA // STATUS: LIDERANÇA_VISIONÁRIA</p>
+                    <h2 style="text-align: right;">O Comando Estratégico</h2>
+                    <p style="text-align: right;">Por trás de todo colaborador que processa novos conhecimentos, existe uma gerente empoderada que aprova a conexão. No dia 02/10/2026, Gabriel transferiu seu sonho. Ela ouviu. Ela validou o potencial. E os dados não foram apagados.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENA 4: O EVENTO (O ALVO) -->
+        <div class="scene" id="scene-3">
+            <h2 class="glitch" data-text="ALVO LOCALIZADO: CBCPD 2026">ALVO LOCALIZADO: CBCPD 2026</h2>
+            <p style="font-size: 1.5rem;">Congresso Brasileiro da Ciência das Plantas Daninhas<br><span style="color: var(--neon-green);">03 a 06 de agosto | Foz do Iguaçu</span></p>
+            <p style="margin-top: 1rem;">O ambiente perfeito para download das maiores atualizações sobre manejo de herbicidas, resistência, inovação e tecnologia de aplicação.</p>
+            <a href="https://cbcpd2026.com.br/" target="_blank" class="btn-link">ACESSAR PORTAL OFICIAL DO EVENTO</a>
+        </div>
+
+        <!-- CENA 5: A PROGRAMAÇÃO E O ROI -->
+        <div class="scene" id="scene-4" style="padding: 2rem;">
+            <h2>Extração de Dados: <span>Programação & ROI</span></h2>
+            <p>Por que essa missão é vital para a rede do Sistema FAEP?</p>
+            
+            <div class="grid-tech">
+                <div class="tech-card">
+                    <h3>[ TECNOLOGIA DE APLICAÇÃO ]</h3>
+                    <p>Discussão profunda sobre novos pulverizadores, uso de adjuvantes e técnicas de mitigação de deriva.</p>
+                    <span class="roi-badge">RETORNO: Atualização imediata dos cursos de aplicadores.</span>
+                </div>
+                <div class="tech-card">
+                    <h3>[ MANEJO DE RESISTÊNCIA ]</h3>
+                    <p>Mapeamento químico das novas moléculas e como combater plantas daninhas que ameaçam as lavouras paranaenses.</p>
+                    <span class="roi-badge">RETORNO: Novos conteúdos práticos para instrutores.</span>
+                </div>
+                <div class="tech-card">
+                    <h3>[ NETWORKING CIENTÍFICO ]</h3>
+                    <p>Conexão direta com os servidores centrais do agro: Pesquisadores de ponta, Embrapa e empresas do setor.</p>
+                    <span class="roi-badge">RETORNO: Contatos estratégicos para o Sistema FAEP.</span>
+                </div>
+            </div>
+            <p class="typewriter-text" style="margin-top: 2rem;">Garantia de segurança: Emissão de relatório técnico completo (e um PPT de 80 slides justificando cada bit investido).</p>
+        </div>
+
+        <!-- CENA 6: DECISÃO FINAL -->
+        <div class="scene" id="scene-5">
+            <p class="typewriter-text">SISTEMA AGUARDANDO COMANDO DE CHEFIA...</p>
+            <h1 style="font-size: 4rem; margin: 1rem 0;">Jéssica, o alcance chegou.</h1>
+            <p style="font-size: 1.5rem;">O agro precisa. O Gabriel precisa. Os produtores merecem. <br>Autorizar essa participação é investir em conhecimento que retornará multiplicado para o Sistema FAEP.</p>
+            
+            <button class="btn-master" onclick="autorizar()">
+                AUTORIZAR MISSÃO AGORA
+            </button>
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentScene = 0;
+        const scenes = document.querySelectorAll('.scene');
+        const progressBar = document.getElementById('progressBar');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const totalScenes = scenes.length;
+
+        // Máquina de escrever para a cena inicial
+        function typeWriter(text, i, fnCallback) {
+            if (i < (text.length)) {
+                document.getElementById("type1").innerHTML = text.substring(0, i+1) + '<span aria-hidden="true">_</span>';
+                setTimeout(function() { typeWriter(text, i + 1, fnCallback) }, 50);
+            } else if (typeof fnCallback == 'function') {
+                setTimeout(fnCallback, 700);
+            }
+        }
+        // Inicia o efeito apenas uma vez no load
+        window.onload = function() {
+            typeWriter("Iniciando decodificação de dados... ", 0);
+            updateHUD();
+        };
+
+        function mudarCena(direction) {
+            scenes[currentScene].classList.remove('active');
+            currentScene += direction;
+            
+            if (currentScene < 0) currentScene = 0;
+            if (currentScene >= totalScenes) currentScene = totalScenes - 1;
+
+            scenes[currentScene].classList.add('active');
+            updateHUD();
+        }
+
+        function updateHUD() {
+            // Atualiza barra de progresso
+            const progress = ((currentScene + 1) / totalScenes) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Controla visibilidade dos botões
+            btnPrev.style.display = currentScene === 0 ? 'none' : 'flex';
+            btnNext.style.display = currentScene === totalScenes - 1 ? 'none' : 'flex';
+        }
+
+        function autorizar() {
+            // Efeito visual de hack/sucesso
+            document.getElementById('interface-container').style.background = "radial-gradient(circle at center, #00ff88 0%, #003311 100%)";
+            document.getElementById('scene-5').innerHTML = `
+                <h1 style="color: #000; text-shadow: none;">MISSÃO APROVADA</h1>
+                <p style="color: #000; font-weight: bold; font-size: 1.5rem; margin-top: 2rem;">Acesso garantido ao CBCPD 2026.<br>Preparar protocolo de retorno (PPT 80 slides).</p>
+            `;
+        }
+    </script>
+</body>
+</html>
